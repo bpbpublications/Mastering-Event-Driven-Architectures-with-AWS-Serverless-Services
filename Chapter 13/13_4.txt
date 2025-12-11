@@ -1,0 +1,14 @@
+# Simplified example of AZ-aware resource placement
+MyDatabase:
+  Type: AWS::RDS::DBInstance
+  Properties:
+    AvailabilityZone: !Select [0, !GetAZs '']
+    # Other properties...
+
+MyLambdaFunction:
+  Type: AWS::Serverless::Function
+  Properties:
+    VpcConfig:
+      SubnetIds:
+        - !Ref SubnetInSameAZ
+    # Other properties...

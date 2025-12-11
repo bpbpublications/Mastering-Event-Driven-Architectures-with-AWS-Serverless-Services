@@ -1,0 +1,27 @@
+class CircuitBreaker {
+  private failures = 0;
+  private nextAttempt = Date.now();
+  private readonly threshold = 5;
+  private readonly resetTimeout = 60000; // 1 minute
+  
+  async execute(operation) {
+    if (Date.now() < this.nextAttempt) {
+      throw new Error("Circuit is open");
+    }
+    
+    try {
+      const result = await operation();
+      this.failures = 0;
+      return result;
+    } catch (error) {
+      this.failures++;
+      
+      if (this.failures >= this.threshold) {
+        this.nextAttempt = Date.now() + this.resetTimeout;
+      }
+      
+      throw error;
+    }
+  }
+}
+

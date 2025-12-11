@@ -1,0 +1,7 @@
+//event.json
+{
+"detail": {
+"importance": ["HIGH" or "CRITICAL"],
+"region" : [ "us-east-1" , "eu-west-1" ]
+}
+}

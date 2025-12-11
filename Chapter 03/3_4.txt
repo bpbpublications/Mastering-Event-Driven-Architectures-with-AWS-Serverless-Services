@@ -1,0 +1,18 @@
+//typescript
+
+import * as AWS from 'aws-sdk';
+const sns = new AWS.SNS();
+
+export const publishEvent = async (event: any) => {
+	const params = {
+    	Message: JSON.stringify(event),
+    	TopicArn: 'arn:aws:sns:us-east-1:123456789012:PatientEvents'
+	};
+
+	try {
+    	const result = await sns.publish(params).promise();
+    	console.log('Event published:', result);
+	} catch (err) {
+    	console.error('Failed to publish event:', err);
+	}
+};

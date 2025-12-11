@@ -1,0 +1,19 @@
+import boto3
+
+sqs = boto3.client('sqs')
+
+def configure_dlq():
+	queue_url = 'https://sqs.us-east-1.amazonaws.com/123456789012/MyQueue'
+	dlq_url = 'https://sqs.us-east-1.amazonaws.com/123456789012/MyDeadLetterQueue'
+    
+	response = sqs.set_queue_attributes(
+    	QueueUrl=queue_url,
+    	Attributes={
+        	'RedrivePolicy': json.dumps({
+            	'deadLetterTargetArn': dlq_url,
+            	'maxReceiveCount': '5'
+        	})
+    	}
+	)
+    
+	return response

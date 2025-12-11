@@ -1,0 +1,4 @@
+# python code
+import json
+import boto3
+eventbridge = boto3.client('events')

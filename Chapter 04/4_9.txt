@@ -1,0 +1,20 @@
+from aws_cdk import (
+    aws_lambda as lambda_,
+    core,
+)
+
+class MyLambdaStack(core.Stack):
+    def __init__(self, scope: core.Construct, id: str, **kwargs):
+        super().__init__(scope, id, **kwargs)
+
+        my_function = lambda_.Function(
+            self, 'MyFunction',
+            runtime=lambda_.Runtime.PYTHON_3_8,
+            handler='handler.lambda_handler',
+            code=lambda_.Code.from_asset('lambda'),
+        )
+
+        version = my_function.current_version
+        alias = lambda_.Alias(self, 'MyAlias', alias_name='prod', version=version)
+
+        alias.add_provisioned_concurrency(10)

@@ -1,0 +1,30 @@
+export async function handler(event, context) {
+  for (const record of event.Records) {
+    // Skip records that aren't INSERTs
+    if (record.eventName !== 'INSERT') continue;
+    
+    // Parse the event from the DynamoDB stream record
+    const streamRecord = record.dynamodb.NewImage;
+    const eventData = unmarshallDynamoDBJson(streamRecord);
+    
+    // Skip records that aren't events
+    if (!eventData.eventType) continue;
+    
+    try {
+      // Process based on event type
+      switch (eventData.eventType) {
+        case 'USER_CREATED':
+          await handleUserCreated(eventData);
+          break;
+        case 'ORDER_PLACED':
+          await handleOrderPlaced(eventData);
+          break;
+        // Handle other event types
+      }
+    } catch (error) {
+      // Log error and determine if retry is appropriate
+      console.error(`Error processing event: ${error.message}`);
+      // Consider implementing Dead Letter Queue pattern
+    }
+  }
+}

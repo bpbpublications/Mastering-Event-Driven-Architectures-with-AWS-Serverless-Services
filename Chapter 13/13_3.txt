@@ -1,0 +1,9 @@
+MyFunction:
+ Type: AWS::Serverless::Function
+ Properties:
+ 	Handler: index.handler
+Runtime: python3.9
+MemorySize: 1024
+Timeout: 10
+ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: 5

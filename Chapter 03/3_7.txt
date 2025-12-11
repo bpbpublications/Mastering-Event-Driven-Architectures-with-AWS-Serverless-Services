@@ -1,0 +1,16 @@
+#python
+import boto3
+
+sqs = boto3.client('sqs')
+
+def send_ordered_event(order_id, action):
+	queue_url = 'https://sqs.us-east-1.amazonaws.com/123456789012/MyFifoQueue'
+    
+	response = sqs.send_message(
+    	QueueUrl=queue_url,
+    	MessageBody=action,
+    	MessageGroupId=order_id,
+    	MessageDeduplicationId=order_id + action
+	)
+    
+	return response

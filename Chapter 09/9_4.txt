@@ -1,0 +1,29 @@
+//typescript
+import { DynamoDBStreamEvent, DynamoDBStreamHandler } from 'aws-lambda';
+import { EventBridgeClient, PutEventsCommand } from "@aws-sdk/client-eventbridge";
+
+const eventBridge = new EventBridgeClient({});
+
+export const handler: DynamoDBStreamHandler = async (event: DynamoDBStreamEvent) => {
+  for (const record of event.Records) {
+    if (record.eventName === 'INSERT') {
+      // Unmarshal the DynamoDB item (convert from DynamoDB JSON to normal JSON)
+      const newImage = record.dynamodb?.NewImage;
+      if (!newImage) continue;
+      const eventItem = AWS.DynamoDB.Converter.unmarshall(newImage);
+      console.log("Processing event", eventItem);
+      // Example: forward this event to EventBridge for broader distribution
+      const detailType = eventItem.eventType;
+      const detail = JSON.stringify(eventItem);
+      await eventBridge.send(new PutEventsCommand({
+        Entries: [{
+          EventBusName: 'default',
+          Source: 'MyApp.Orders',
+          DetailType: detailType,
+          Detail: detail
+        }]
+      }));
+    }
+    // (Handle MODIFY or REMOVE if needed, in this case probably not)
+  }
+};

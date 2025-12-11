@@ -1,0 +1,11 @@
+#python
+import boto3
+ kms = boto3.client('kms')
+ key_id = 'alias/MyAppKey' # alias or key-id of the CMK
+ plaintext = b"SensitivePayload123"
+ response = kms.encrypt(KeyId=key_id, Plaintext=plaintext)
+ cipher_blob = response['CiphertextBlob']
+ # You can store cipher_blob safely, and decrypt when needed:
+ plain_response = kms.decrypt(CiphertextBlob=cipher_blob)
+ print(plain_response['Plaintext']) # b"SensitivePayload123"
+

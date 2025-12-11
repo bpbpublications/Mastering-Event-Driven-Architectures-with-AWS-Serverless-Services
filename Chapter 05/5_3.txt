@@ -1,0 +1,7 @@
+const dlq = new sqs.Queue(this, 'DeadLetterQueue');
+const orderQueue = new sqs.Queue(this, 'OrderQueue', {
+  deadLetterQueue: {
+    maxReceiveCount: 5,
+    queue: dlq,
+  },
+});

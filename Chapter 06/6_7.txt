@@ -1,0 +1,13 @@
+//python
+def is_replay_event(event):
+    # Check for replay context in event
+    replay_name = event.get('replay-name')
+    return replay_name is not None
+
+def process_event(event):
+    if is_replay_event(event):
+        # Apply replay-specific processing
+        handle_replay_event(event)
+    else:
+        # Normal event processing
+        handle_normal_event(event)

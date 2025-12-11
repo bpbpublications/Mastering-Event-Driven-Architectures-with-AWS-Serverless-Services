@@ -1,0 +1,22 @@
+//terminal
+aws events put-events --entries file://inputevents.json
+
+The following are the contents of inputevents.json file:
+' [{
+    "Source": "acme.oms",
+    "Detail": "{ \"key1\": \"value1\", \"key2\": \"value2\" }",
+    "Resources": [
+      "resource1",
+      "resource2"
+    ],
+    "DetailType": "orderdetails"
+  },
+  {
+    "Source": "acme.Inventory",
+    "Detail": "{ \"key1\": \"value3\", \"key2\": \"value4\" }",
+    "Resources": [
+      "resource1",
+      "resource2"
+    ]
+   }
+]'

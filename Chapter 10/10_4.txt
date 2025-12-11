@@ -1,0 +1,27 @@
+#python
+from jsonschema import validate, ValidationError
+
+# Define (or load) the JSON schema for OrderCreated events
+order_created_schema = {
+    "type": "object",
+    "properties": {
+        "detail-type": {"const": "OrderCreated"},
+        "source": {"type": "string"},
+        "detail": {
+            "type": "object",
+            "properties": {
+                "orderId": {"type": "string"},
+                "customer": {"type": "string"},
+                "total": {"type": "number"}
+            },
+            "required": ["orderId", "total"]
+        }
+    },
+    "required": ["detail-type", "source", "detail"]
+}
+
+# ... inside a test, given event_json (the event captured or created):
+try:
+    validate(instance=event_json, schema=order_created_schema)
+except ValidationError as e:
+    pytest.fail(f"Produced event does not match schema: {e}")

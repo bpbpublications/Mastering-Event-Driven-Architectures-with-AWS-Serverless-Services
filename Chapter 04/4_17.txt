@@ -1,0 +1,4 @@
+sam init --runtime python3.8 --name my-sam-app
+cd my-sam-app
+sam build
+sam local invoke "MyFunction" -e event.json

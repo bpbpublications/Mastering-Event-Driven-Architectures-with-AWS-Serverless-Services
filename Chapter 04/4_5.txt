@@ -1,0 +1,5 @@
+def lambda_handler(event, context):
+    for record in event['Records']:
+        message_body = record['body']
+        print(f"Processing message: {message_body}")
+        # Process the message

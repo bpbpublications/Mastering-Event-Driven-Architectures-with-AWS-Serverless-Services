@@ -1,0 +1,18 @@
+{
+  "$id": "com.example.events#OrderCreated",
+  "type": "object",
+  "properties": {
+    "detail-type": { "const": "OrderCreated" },
+    "source":    { "type": "string", "const": "com.example.orders" },
+    "detail": {
+      "type": "object",
+      "properties": {
+        "orderId":  { "type": "string" },
+        "customer": { "type": "string" },
+        "total":    { "type": "number" }
+      },
+      "required": ["orderId", "total"]
+    }
+  },
+  "required": ["detail-type", "source", "detail"]
+}

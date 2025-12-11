@@ -1,0 +1,31 @@
+# python
+
+import boto3
+from botocore.exceptions import ClientError
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('Payments')
+
+def lambda_handler(event, context):
+	payment_id = event['paymentId']
+	order_id = event['orderId']
+    
+	# Enforce idempotency by ensuring the payment ID hasn't been processed before
+	try:
+    	response = table.put_item(
+        	Item={
+            	'PaymentId': payment_id,
+            	'OrderId': order_id,
+            	'Status': 'Processed'
+        	},
+        	ConditionExpression="attribute_not_exists(PaymentId)"
+    	)
+	except ClientError as e:
+    	if e.response['Error']['Code'] == 'ConditionalCheckFailedException':
+        	# Payment has already been processed, skip re-processing
+        	return {
+            	'statusCode': 200,
+            	'body': 'Payment already processed'
+        	}
+    	else:
+        	raise

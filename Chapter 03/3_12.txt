@@ -1,0 +1,19 @@
+#python
+import json
+import boto3
+
+s3 = boto3.client('s3')
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('ProcessedData')
+
+def lambda_handler(event, context):
+	# Get the uploaded file details
+	for record in event['Records']:
+    	bucket = record['s3']['bucket']['name']
+    	key = record['s3']['object']['key']
+   	 
+    	# Process the file
+    	data = process_file(bucket, key)
+   	 
+    	# Store the processed data in DynamoDB
+    	table.put_item(Item=data)

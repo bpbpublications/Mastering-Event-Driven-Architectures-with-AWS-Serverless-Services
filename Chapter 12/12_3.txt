@@ -1,0 +1,4 @@
+import boto3
+ ssm = boto3.client('ssm')
+ param = ssm.get_parameter(Name='/myApp/prod/dbPassword', WithDecryption=True)
+ db_password = param['Parameter']['Value']

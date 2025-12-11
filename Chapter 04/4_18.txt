@@ -1,0 +1,14 @@
+import * as cdk from '@aws-cdk/core';
+import * as pipelines from '@aws-cdk/pipelines';
+
+const pipeline = new pipelines.CodePipeline(this, 'Pipeline', {
+    synth: new pipelines.ShellStep('Synth', {
+        input: pipelines.CodePipelineSource.gitHub('my-org/my-app', 'main'),
+        commands: ['npm ci', 'npm run build', 'npx cdk synth'],
+    }),
+});
+
+pipeline.addStage(new MyApplicationStage(this, 'PreProd', {
+    env: { account: '123456789012', region: 'us-west-2' },
+}));
+

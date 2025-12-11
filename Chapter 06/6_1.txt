@@ -1,0 +1,6 @@
+{
+  "Effect": "Allow",
+  "Principal": {"Service": "lambda.amazonaws.com"},
+  "Action": "events:PutEvents",
+  "Resource": "arn:aws:events:us-east-1:123456789012:event-bus/myCustomEventBus"
+}

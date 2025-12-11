@@ -1,0 +1,38 @@
+import * as sfn from '@aws-cdk/aws-stepfunctions';
+import * as tasks from '@aws-cdk/aws-stepfunctions-tasks';
+
+const ingestDataTask = new tasks.LambdaInvoke(this, 'IngestData', {
+    lambdaFunction: ingestDataFunction,
+    outputPath: '$.Payload',
+});
+
+const transformDataTask = new tasks.LambdaInvoke(this, 'TransformData', {
+    lambdaFunction: transformDataFunction,
+    outputPath: '$.Payload',
+});
+
+const validateDataTask = new tasks.LambdaInvoke(this, 'ValidateData', {
+    lambdaFunction: validateDataFunction,
+    outputPath: '$.Payload',
+});
+
+const validationChoice = new sfn.Choice(this, 'ValidationPassed?');
+const successState = new sfn.Succeed(this, 'Success');
+const errorState = new sfn.Fail(this, 'ValidationFailed', {
+    cause: 'Data validation failed',
+    error: 'ValidationError',
+});
+
+validationChoice
+    .when(sfn.Condition.booleanEquals('$.isValid', true), successState)
+    .otherwise(errorState);
+
+const definition = ingestDataTask
+    .next(transformDataTask)
+    .next(validateDataTask)
+    .next(validationChoice);
+
+const stateMachine = new sfn.StateMachine(this, 'DataProcessingStateMachine', {
+    definition,
+});
+

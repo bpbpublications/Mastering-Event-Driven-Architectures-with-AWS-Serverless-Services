@@ -1,0 +1,23 @@
+# python code
+import json
+import boto3
+
+eventbridge = boto3.client('events')
+
+def lambda_handler(event, context):
+	# Triggering an event when a user places an order
+	response = eventbridge.put_events(
+    	Entries=[
+        	{
+            	'Source': 'ecommerce.application',
+            	'DetailType': 'OrderPlaced',
+            	'Detail': json.dumps({
+                	'userId': event['userId'],
+                	'orderId': event['orderId'],
+                	'amount': event['amount']
+            	}),
+            	'EventBusName': 'ecommerce-events'
+        	}
+    	]
+	)
+	return response

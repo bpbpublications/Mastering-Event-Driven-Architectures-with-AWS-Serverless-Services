@@ -1,0 +1,4 @@
+aws lambda update-function-configuration \
+    --function-name MyFunction \
+    --layers arn:aws:lambda:region:account-id:layer:MyLayer:1
+

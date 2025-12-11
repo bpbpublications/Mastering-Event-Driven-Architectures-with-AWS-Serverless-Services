@@ -1,0 +1,10 @@
+//python
+def handle_event(event):
+    # Extract event ID and timestamp
+    event_id = event['id']
+    event_time = event['time']
+    
+    # Check if event was already processed
+    if not is_duplicate_event(event_id, event_time):
+        process_event(event)
+        record_processed_event(event_id, event_time)

@@ -1,0 +1,22 @@
+#python
+
+import json
+import boto3
+
+def lambda_handler(event, context):
+	dynamodb = boto3.resource('dynamodb')
+	table = dynamodb.Table('Inventory')
+    
+	for record in event['Records']:
+    	if record['eventName'] == 'INSERT':
+        	new_image = record['dynamodb']['NewImage']
+        	item_id = new_image['ItemId']['S']
+        	quantity = new_image['Quantity']['N']
+
+        	# Eventually consistent read and update of inventory
+        	table.update_item(
+            	Key={'ItemId': item_id},
+            	UpdateExpression="set Quantity = Quantity - :val",
+            	ExpressionAttributeValues={':val': int(quantity)},
+            	ReturnValues="UPDATED_NEW"
+        	)

@@ -1,0 +1,12 @@
+# Python
+from aws_lambda_powertools import Metrics
+from aws_lambda_powertools.metrics import MetricUnit
+
+metrics = Metrics(namespace="OrderService", service="PaymentProcessor")
+
+def handler(event, context):
+    # Record a custom metric for a processed order
+    metrics.add_metric(name="SuccessfulPayments", unit=MetricUnit.Count, value=1)
+    # ... function logic ...
+    metrics.flush_metrics()  # Ensures the metric is published (if not using an auto-decorator)
+    return {"status": "success"}

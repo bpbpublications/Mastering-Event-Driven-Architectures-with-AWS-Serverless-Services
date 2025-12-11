@@ -1,0 +1,32 @@
+# Python example: test_my_lambda.py
+import json
+import boto3
+from moto import mock_dynamodb
+from my_lambda import handler  # your Lambda handler
+
+SQS_EVENT = {
+    "Records": [
+        {
+            "messageId": "1",
+            "body": json.dumps({"orderId": "123", "amount": 50})
+        }
+    ]
+}
+
+@mock_dynamodb
+def test_lambda_writes_to_dynamodb():
+    # Set up a fake DynamoDB table
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+    table = dynamodb.create_table(
+        TableName='Orders',
+        KeySchema=[{"AttributeName": "orderId", "KeyType": "HASH"}],
+        AttributeDefinitions=[{"AttributeName": "orderId", "AttributeType": "S"}],
+        BillingMode='PAY_PER_REQUEST'
+    )
+    table.wait_until_exists()
+    # Call Lambda handler with the SQS event
+    result = handler(SQS_EVENT, None)
+    # Fetch item from the table to verify it was written
+    item = table.get_item(Key={"orderId": "123"}).get('Item')
+    assert item is not None
+    assert item['amount'] == 50

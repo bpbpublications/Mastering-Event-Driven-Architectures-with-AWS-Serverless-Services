@@ -1,0 +1,20 @@
+# Example Lambda handler for updating a materialized view
+def handler(event, context):
+    for record in event['Records']:
+        if record['eventName'] != 'INSERT':
+            continue  # Only process new events
+        
+        # Extract the event from the stream record
+        stream_record = record['dynamodb']['NewImage']
+        event_data = deserialize_dynamodb_json(stream_record)
+        
+        # Skip if this is not an event record
+        if 'eventType' not in event_data:
+            continue
+        
+        # Update different materialized views based on event type
+        if event_data['eventType'] == 'ORDER_PLACED':
+            update_customer_order_history(event_data)
+            update_daily_sales_metrics(event_data)
+            update_inventory_levels(event_data)
+

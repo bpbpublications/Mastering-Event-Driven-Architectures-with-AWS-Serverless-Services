@@ -1,0 +1,19 @@
+import * as lambda from '@aws-cdk/aws-lambda';
+import * as ec2 from '@aws-cdk/aws-ec2';
+
+const vpc = ec2.Vpc.fromLookup(this, 'VPC', { vpcId: 'vpc-12345678' });
+
+const securityGroup = new ec2.SecurityGroup(this, 'LambdaSG', {
+    vpc,
+    description: 'Allow outbound traffic to RDS',
+});
+
+securityGroup.addEgressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(3306), 'Allow MySQL access');
+
+const myFunction = new lambda.Function(this, 'MyFunction', {
+    runtime: lambda.Runtime.NODEJS_14_X,
+    code: lambda.Code.fromAsset('lambda'),
+    handler: 'index.handler',
+    vpc,
+    securityGroups: [securityGroup],
+});

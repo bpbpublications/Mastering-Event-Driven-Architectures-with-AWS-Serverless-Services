@@ -1,0 +1,30 @@
+# This Lambda handler is triggered by DynamoDB Stream events for the Orders 
+table.
+ import json, os
+ import boto3
+ # initialize AWS clients outside handler for reuse
+ es_client = boto3.client('opensearch') # OpenSearch client
+ sns_client = boto3.client('sns')
+ SNS_TOPIC_ARN = os.environ['SNS_TOPIC_ARN']
+ def handler(event, context):
+ for record in event['Records']:
+ if record['eventName'] == 'INSERT':
+ new_order = record['dynamodb']['NewImage']
+ order_id = new_order['OrderId']['S']
+ # Prepare document for OpenSearch
+ doc = {
+ "orderId": order_id,
+ "customerId": new_order['CustomerId']['S'],
+ "total": float(new_order['Total']['N']),
+ # ... other fields ...
+ }
+ # Index document into OpenSearch (assume index 'orders')
+ es_client.index(
+ Index='orders',
+ Id=order_id,
+ Body=json.dumps(doc)
+ )
+ # Publish an SNS message to notify other services of new order
+ message = {"orderId": order_id, "event": "OrderPlaced"}
+ sns_client.publish(TopicArn=SNS_TOPIC_ARN,
+ Message=json.dumps(message))

@@ -1,0 +1,11 @@
+//TypeScript
+import { Metrics, MetricUnits, MetricUnit, logMetrics } from '@aws-lambda-powertools/metrics';
+const metrics = new Metrics({ namespace: 'OrderService', serviceName: 'PaymentProcessor' });
+
+export const handler = async (event: any, context: any) => {
+  // Record a custom metric
+  metrics.addMetric('SuccessfulPayments', MetricUnits.Count, 1);
+  metrics.publishStoredMetrics();  // flush the metrics by logging in EMF format
+  // ... function logic ...
+  return { status: 'success' };
+};

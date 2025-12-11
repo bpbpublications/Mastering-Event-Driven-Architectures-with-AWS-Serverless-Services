@@ -1,0 +1,9 @@
+import { KinesisStreamEvent } from 'aws-lambda';
+
+export const handler = async (event: KinesisStreamEvent): Promise<void> => {
+    for (const record of event.Records) {
+        const payload = Buffer.from(record.kinesis.data, 'base64').toString('utf-8');
+        console.log(`Received record: ${payload}`);
+        // Process the record
+    }
+};

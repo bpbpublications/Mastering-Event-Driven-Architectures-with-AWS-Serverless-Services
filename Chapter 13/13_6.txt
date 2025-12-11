@@ -1,0 +1,50 @@
+// Pseudo-code for latency budget monitoring
+export async function handler(event, context) {
+    // Extract latency budget information from event metadata
+    const eventMetadata = event.metadata || {};
+    const startTime = Date.now();
+    const chainStartTime = eventMetadata.chainStartTime || startTime;
+    const totalBudgetMs = eventMetadata.totalBudgetMs || 1000; // 1 second default
+    const consumedBudgetMs = eventMetadata.consumedBudgetMs || 0;
+    
+    // Check if we've already exceeded total budget
+    const totalElapsedMs = startTime - chainStartTime;
+    if (totalElapsedMs > totalBudgetMs) {
+        console.warn(`Latency budget exceeded before processing: ${totalElapsedMs}ms > ${totalBudgetMs}ms`);
+        // Consider implementing graceful degradation here
+    }
+    
+    // Calculate service's individual budget (example allocation)
+    const myServiceBudgetMs = totalBudgetMs * 0.3; // 30% of total budget
+    
+    try {
+        // Normal processing
+        const result = await processEvent(event);
+        
+        // Calculate service processing time
+        const serviceProcessingTime = Date.now() - startTime;
+        
+        // Log budget compliance
+        if (serviceProcessingTime > myServiceBudgetMs) {
+            console.warn(`Service exceeded its latency budget: ${serviceProcessingTime}ms > ${myServiceBudgetMs}ms`);
+        }
+        
+        // Update metadata for downstream services
+        const updatedMetadata = {
+            chainStartTime,
+            totalBudgetMs,
+            consumedBudgetMs: consumedBudgetMs + serviceProcessingTime,
+            previousService: context.functionName
+        };
+        
+        // Forward to next service with updated metadata
+        return {
+            ...result,
+            metadata: updatedMetadata
+        };
+    } catch (error) {
+        // Error handling
+        throw error;
+    }
+}
+

@@ -1,0 +1,11 @@
+def handle_order_placed(event_data):
+    # Extract order ID from the event
+    order_id = event_data['data']['orderId']
+    
+    # Check if we've already processed this order
+    existing_order = get_order_from_projection(order_id)
+    if existing_order and existing_order['status'] != 'PENDING':
+        print(f"Order {order_id} already processed, skipping")
+        return
+    
+    # Process the order...

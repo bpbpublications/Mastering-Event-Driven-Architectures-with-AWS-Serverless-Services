@@ -1,0 +1,9 @@
+import { SNSEvent } from 'aws-lambda';
+
+export const handler = async (event: SNSEvent): Promise<void> => {
+    for (const record of event.Records) {
+        const message = record.Sns.Message;
+        console.log(`Received message: ${message}`);
+        // Process the message
+    }
+};

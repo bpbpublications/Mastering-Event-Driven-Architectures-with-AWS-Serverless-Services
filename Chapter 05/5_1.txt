@@ -1,0 +1,12 @@
+//TypeScript, uses aws cdk
+import * as sns from 'aws-cdk-lib/aws-sns';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
+
+const orderEventsTopic = new sns.Topic(this, "OrderEventsTopic");
+
+const inventoryQueue = new sqs.Queue(this, "InventoryQueue");
+const billingQueue = new sqs.Queue(this, "BillingQueue");
+
+orderEventsTopic.addSubscription(new subscriptions.SqsSubscription(inventoryQueue));
+orderEventsTopic.addSubscription(new subscriptions.SqsSubscription(billingQueue));

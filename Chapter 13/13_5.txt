@@ -1,0 +1,12 @@
+json
+{
+  "Statement": [
+    {
+      "Action": "dynamodb:*",
+      "Effect": "Allow",
+      "Resource": "*",
+      "Principal": "*"
+    }
+  ]
+}
+

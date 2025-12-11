@@ -1,0 +1,19 @@
+//TypeScript
+import { KinesisClient, PutRecordCommand } from "@aws-sdk/client-kinesis";
+
+const client = new KinesisClient({ region: "us-east-1" });
+const streamName = "my-kinesis-stream";
+
+async function sendDataToKinesis() {
+    const record = {
+        Data: JSON.stringify({ message: "Hello, Kinesis!" }),
+        PartitionKey: "partition-key-1",
+        StreamName: streamName,
+    };
+    const command = new PutRecordCommand(record);
+    await client.send(command);
+    console.log("Record sent to Kinesis");
+}
+
+sendDataToKinesis().catch(console.error);
+

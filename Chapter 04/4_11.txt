@@ -1,0 +1,12 @@
+import aws_cdk.aws_events as events
+import aws_cdk.aws_events_targets as targets
+
+rule = events.Rule(
+    self, 'OrderPlacedRule',
+    event_pattern=events.EventPattern(
+        source=['my.application'],
+        detail_type=['OrderPlaced'],
+    ),
+)
+
+rule.add_target(targets.LambdaFunction(orderProcessingFunction))

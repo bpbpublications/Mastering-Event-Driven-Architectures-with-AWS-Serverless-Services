@@ -1,0 +1,27 @@
+from aws_lambda_powertools import Logger, Tracer, Metrics
+from aws_lambda_powertools.metrics import MetricUnit
+
+# Initialize outside the handler for reuse and to tag cold start once
+logger = Logger(service="PaymentService")
+tracer = Tracer(service="PaymentService")
+metrics = Metrics(namespace="OrderApp", service="PaymentService")
+
+@tracer.capture_lambda_handler  # capture tracing for this function
+@metrics.log_metrics  # auto-publish metrics at the end of function
+@logger.inject_lambda_context(log_event=True)  # log context and event
+def handler(event, context):
+    # The logger will already log the event and context thanks to decorator
+    payment_id = event.get("paymentId", "N/A")
+    # Add paymentId to all subsequent logs
+    logger.append_keys(paymentId=payment_id)
+    logger.info("Processing payment")
+    try:
+        # ... processing logic ...
+        metrics.add_metric("ProcessedPayments", unit=MetricUnit.Count, value=1)
+        logger.info("Payment processed successfully")
+        return { "status": "OK" }
+    except Exception as e:
+        metrics.add_metric("FailedPayments", unit=MetricUnit.Count, value=1)
+        logger.exception("Payment processing failed")
+        raise
+

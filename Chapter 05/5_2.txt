@@ -1,0 +1,5 @@
+//TypeScript
+const orderQueue = new sqs.Queue(this, "OrderQueue", {
+  visibilityTimeout: cdk.Duration.seconds(30),
+  retentionPeriod: cdk.Duration.days(4),
+});

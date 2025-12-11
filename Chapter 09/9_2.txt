@@ -1,0 +1,30 @@
+// Simplified example of optimistic concurrency with versioning
+async function appendEvent(aggregateId, event, expectedVersion) {
+  try {
+    await dynamoDb.putItem({
+      TableName: "EventStore",
+      Item: {
+        partitionKey: aggregateId,
+        sortKey: `EVENT#${new Date().toISOString()}`,
+        eventType: event.type,
+        data: event.data,
+        version: expectedVersion + 1,
+        // other attributes
+      },
+      ConditionExpression: "attribute_not_exists(partitionKey) OR #version = :expectedVersion",
+      ExpressionAttributeNames: {
+        "#version": "version"
+      },
+      ExpressionAttributeValues: {
+        ":expectedVersion": expectedVersion
+      }
+    });
+    return { success: true, newVersion: expectedVersion + 1 };
+  } catch (error) {
+    if (error.name === "ConditionalCheckFailedException") {
+      return { success: false, error: "Concurrency conflict" };
+    }
+    throw error;
+  }
+}
+

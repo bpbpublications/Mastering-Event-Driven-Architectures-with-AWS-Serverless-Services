@@ -1,0 +1,57 @@
+//orderstatemachine.json
+{
+  "StartAt": "Validate Order",
+  "States": {
+    "Validate Order": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:validateOrder",
+      "Next": "Check Inventory"
+    },
+    "Check Inventory": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:checkInventory",
+      "Next": "Process Payment"
+    },
+    "Process Payment": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:processPayment",
+      "Next": "Fraud Detection"
+    },
+    "Fraud Detection": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:fraudDetection",
+      "Next": "Choice Fraud Check"
+    },
+    "Choice Fraud Check": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.fraudStatus",
+          "StringEquals": "approved",
+          "Next": "Fulfill Order"
+        },
+        {
+          "Variable": "$.fraudStatus",
+          "StringEquals": "review",
+          "Next": "Manual Review"
+        }
+      ],
+      "Default": "Payment Declined"
+    },
+    "Manual Review": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:manualReview",
+      "Next": "Fulfill Order"
+    },
+    "Payment Declined": {
+      "Type": "Fail",
+      "Cause": "Fraud detected",
+      "Error": "PaymentRejected"
+    },
+    "Fulfill Order": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:123456789012:function:fulfillOrder",
+      "Next": "Notify Customer"
+    },…
+  
+

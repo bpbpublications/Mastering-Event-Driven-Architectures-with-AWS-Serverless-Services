@@ -1,0 +1,7 @@
+const inventoryDLQ = new sqs.Queue(this, 'InventoryDLQ');
+const inventoryQueue = new sqs.Queue(this, 'InventoryQueue', {
+  deadLetterQueue: {
+    maxReceiveCount: 5,
+    queue: inventoryDLQ,
+  }
+});

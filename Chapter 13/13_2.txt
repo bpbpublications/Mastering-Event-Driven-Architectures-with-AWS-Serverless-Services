@@ -1,0 +1,5 @@
+import boto3
+ def handler(event, context):
+ # Ping the target function to keep it warm
+ client = boto3.client('lambda')
+ client.invoke(FunctionName='MyFunction', InvocationType='Event')

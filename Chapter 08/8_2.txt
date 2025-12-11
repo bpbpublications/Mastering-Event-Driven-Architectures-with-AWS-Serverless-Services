@@ -1,0 +1,18 @@
+#python
+import boto3
+
+def read_kinesis_stream():
+    client = boto3.client("kinesis", region_name="us-east-1")
+    response = client.get_shard_iterator(
+        StreamName="my-kinesis-stream",
+        ShardId="shardId-000000000000",
+        ShardIteratorType="LATEST"
+    )
+    iterator = response["ShardIterator"]
+    while True:
+        records = client.get_records(ShardIterator=iterator)
+        for record in records["Records"]:
+            print(record["Data"].decode("utf-8"))
+        iterator = records["NextShardIterator"]
+
+read_kinesis_stream()

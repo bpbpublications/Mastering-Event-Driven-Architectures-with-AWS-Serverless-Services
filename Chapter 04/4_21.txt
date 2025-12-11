@@ -1,0 +1,12 @@
+import * as lambdaEventSources from '@aws-cdk/aws-lambda-event-sources';
+
+const eventSource = new lambdaEventSources.SqsEventSource(queue, {
+    filters: [
+        {
+            eventType: [{ prefix: 'UserSignup' }],
+        },
+    ],
+});
+
+myFunction.addEventSource(eventSource);
+

@@ -1,0 +1,37 @@
+OrderProcessingErrorAlarm:
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmName: "OrderProcessingErrorAlarm"
+    Namespace: AWS/Lambda
+    MetricName: Errors
+    Dimensions:
+      - Name: FunctionName
+        Value: OrderProcessorFunction
+    Statistic: Sum
+    Period: 60
+    EvaluationPeriods: 1
+    Threshold: 1
+    ComparisonOperator: GreaterThanOrEqualToThreshold
+
+OrderProcessingHighLatencyAlarm:
+  Type: AWS::CloudWatch::Alarm
+  Properties:
+    AlarmName: "OrderProcessingHighLatencyAlarm"
+    Namespace: AWS/Lambda
+    MetricName: Duration
+    Dimensions:
+      - Name: FunctionName
+        Value: OrderProcessorFunction
+    Statistic: Average
+    Period: 60
+    EvaluationPeriods: 3
+    Threshold: 5000
+    ComparisonOperator: GreaterThanThreshold
+
+OrderProcessingCompositeAlarm:
+  Type: AWS::CloudWatch::CompositeAlarm
+  Properties:
+    AlarmName: "OrderProcessingCompositeAlarm"
+    AlarmRule: !Sub "(ALARM(${OrderProcessingErrorAlarm})) OR (ALARM(${OrderProcessingHighLatencyAlarm}))"
+    AlarmActions:
+      - !Ref CriticalAlertsSNSTopic

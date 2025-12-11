@@ -1,0 +1,5 @@
+fields @timestamp, @message
+| filter orderId = "12345" and level = "ERROR"
+| sort @timestamp desc
+| limit 20
+

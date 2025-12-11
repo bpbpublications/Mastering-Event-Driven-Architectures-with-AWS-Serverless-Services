@@ -1,0 +1,19 @@
+def get_aggregate_state(aggregate_id):
+    # Get the latest snapshot
+    snapshot = get_latest_snapshot(aggregate_id)
+    
+    # Start with snapshot state if available, otherwise empty state
+    if snapshot:
+        state = snapshot['state']
+        from_version = snapshot['version'] + 1
+    else:
+        state = {}
+        from_version = 0
+    
+    # Get events after the snapshot
+    events = get_events(aggregate_id, from_version)
+    
+    # Apply events to build current state
+    for event in events:
+        state = apply_event(state, event)
+    return state

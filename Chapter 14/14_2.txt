@@ -1,0 +1,12 @@
+{ 
+"eventType": "PaymentProcessed", 
+"paymentId": "abc123", 
+"orderId": "o-12221", 
+"amount": 250.50, 
+"currency": "INR", 
+"customerId": "c-789", 
+"paymentMethod": "CreditCard", 
+"status": "Success",
+"processedAt": "2025-07-3T18:40:00Z"
+}
+

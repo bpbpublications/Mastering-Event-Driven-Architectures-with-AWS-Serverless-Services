@@ -1,0 +1,15 @@
+import * as ec2 from '@aws-cdk/aws-ec2';
+
+const vpc = ec2.Vpc.fromLookup(this, 'VPC', { vpcId: 'vpc-12345678' });
+
+// Create an interface VPC endpoint for Secrets Manager
+vpc.addInterfaceEndpoint('SecretsManagerEndpoint', {
+    service: ec2.InterfaceVpcEndpointAwsService.SECRETS_MANAGER,
+});
+
+const myFunction = new lambda.Function(this, 'MyFunction', {
+    // ... other properties ...
+    vpc,
+    vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+    securityGroups: [mySecurityGroup],
+});

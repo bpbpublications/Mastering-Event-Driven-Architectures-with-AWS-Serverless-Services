@@ -1,0 +1,24 @@
+#json
+{
+  "StartAt": "CreditCheck",
+  "States": {
+	"CreditCheck": {
+  	"Type": "Task",
+  	"Resource": "arn:aws:lambda:us-east-1:123456789012:function:CreditCheck",
+  	"TimeoutSeconds": 60,
+  	"Retry": [
+    	{
+      	"ErrorEquals": ["Lambda.ServiceException", "Lambda.AWSLambdaException"],
+      	"IntervalSeconds": 5,
+      	"MaxAttempts": 3
+    	}
+  	],
+  	"Next": "EmploymentVerification"
+	},
+	"EmploymentVerification": {
+  	"Type": "Task",
+  	"Resource": "arn:aws:lambda:us-east-1:123456789012:function:EmploymentVerification",
+  	"End": true
+	}
+  }
+}

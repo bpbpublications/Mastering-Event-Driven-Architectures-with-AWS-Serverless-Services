@@ -1,0 +1,49 @@
+//TypeScript
+import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
+import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from "@aws-sdk/client-sqs";
+
+const lambdaClient = new LambdaClient({ region: 'us-east-1' });
+const sqsClient = new SQSClient({ region: 'us-east-1' });
+
+test('Order service emits correct OrderCreated event', async () => {
+  const orderRequest = { orderId: "abc123", customer: "Alice", total: 99.99 };
+  // Invoke the Order Lambda function with a test event (simulate API Gateway payload)
+  const apiEvent = {
+    body: JSON.stringify(orderRequest),
+    httpMethod: "POST",
+    path: "/orders"
+    // ... other API Gateway event fields as needed
+  };
+  await lambdaClient.send(new InvokeCommand({
+    FunctionName: "OrderServiceFunction",
+    Payload: Buffer.from(JSON.stringify(apiEvent))
+  }));
+  
+  // Poll the SQS queue for a message (event) for up to 5 seconds
+  const queueUrl = process.env.TEST_QUEUE_URL!;
+  let eventMessage;
+  const start = Date.now();
+  while (!eventMessage && Date.now() - start < 5000) {
+    const resp = await sqsClient.send(new ReceiveMessageCommand({
+      QueueUrl: queueUrl,
+      WaitTimeSeconds: 1,
+      MaxNumberOfMessages: 1
+    }));
+    if (resp.Messages && resp.Messages.length > 0) {
+      eventMessage = resp.Messages[0];
+      // Delete the message from queue to clean up
+      await sqsClient.send(new DeleteMessageCommand({
+        QueueUrl: queueUrl,
+        ReceiptHandle: eventMessage.ReceiptHandle!
+      }));
+      break;
+    }
+    // else, loop again
+  }
+  expect(eventMessage).toBeDefined();
+  const eventBody = JSON.parse(eventMessage!.Body!);
+  // The EventBridge event payload has a certain structure: detail, source, detail-type, etc.
+  expect(eventBody["detail-type"]).toBe("OrderCreated");
+  expect(eventBody.source).toBe("com.example.orders");
+  expect(eventBody.detail).toMatchObject(orderRequest);
+});

@@ -1,0 +1,13 @@
+import boto3
+import os
+
+def get_secret(secret_name):
+    client = boto3.client('secretsmanager')
+    response = client.get_secret_value(SecretId=secret_name)
+    return response['SecretString']
+
+def lambda_handler(event, context):
+    secret_name = os.environ.get('SECRET_NAME')
+    secret_value = get_secret(secret_name)
+    # Use the secret_value securely
+

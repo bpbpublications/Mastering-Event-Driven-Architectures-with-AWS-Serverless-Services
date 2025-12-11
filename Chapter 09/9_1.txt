@@ -1,0 +1,28 @@
+// Example events in an order's lifetime
+const orderEvents = [
+  {
+    type: 'ORDER_CREATED',
+    orderId: 'ORD-12345',
+    customerId: 'CUST-789',
+    items: [...],
+    timestamp: '2025-09-04T12:00:00Z'
+  },
+  {
+    type: 'PAYMENT_PROCESSED',
+    orderId: 'ORD-12345',
+    paymentId: 'PAY-456',
+    amount: 67.48,
+    timestamp: '2025-09-04T12:01:30Z'
+  },
+  {
+    type: 'ORDER_FULFILLED',
+    orderId: 'ORD-12345',
+    shipmentId: 'SHIP-789',
+    timestamp: '2025-09-04T15:30:00Z'
+  },
+  {
+    type: 'ORDER_DELIVERED',
+    orderId: 'ORD-12345',
+    deliveryTime: '2025-09-07T14:25:00Z',
+    timestamp: '2025-09-07T14:25:00Z'
+  }

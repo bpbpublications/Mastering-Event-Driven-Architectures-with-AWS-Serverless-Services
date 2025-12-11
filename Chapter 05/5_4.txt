@@ -1,0 +1,7 @@
+orderEventsTopic.addSubscription(new subscriptions.SqsSubscription(inventoryQueue, {
+  filterPolicy: {
+    action: sns.SubscriptionFilter.stringFilter({
+      allowlist: ['order_placed', 'order_canceled'],
+    }),
+  },
+}));

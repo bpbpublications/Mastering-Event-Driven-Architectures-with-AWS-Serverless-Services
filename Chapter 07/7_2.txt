@@ -1,0 +1,10 @@
+//statemachine.json
+"Retry": [
+  {
+    "ErrorEquals": ["States.Timeout", "States.TaskFailed"],
+    "IntervalSeconds": 5,
+    "MaxAttempts": 3,
+    "BackoffRate": 2.0
+  }
+]
+

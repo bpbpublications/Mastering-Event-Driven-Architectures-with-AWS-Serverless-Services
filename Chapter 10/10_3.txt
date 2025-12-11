@@ -1,0 +1,27 @@
+Pseudo-code in Python for consumer integration test:
+from my_invoice_lambda import handler  # assume we can import it
+import boto3, os
+
+# Prepare a dummy EventBridge event that Invoice service expects
+event = {
+    "detail-type": "OrderCreated",
+    "source": "com.example.orders",
+    "detail": {
+        "orderId": "abc123",
+        "customer": "Alice",
+        "total": 99.99
+    }
+}
+
+def test_invoice_generation(monkeypatch):
+    # Monkeypatch environment variables that Lambda expects (like target bucket)
+    os.environ["INVOICE_BUCKET"] = "test-invoices-bucket"
+    # Ensure the test bucket exists
+    s3 = boto3.client('s3')
+    s3.create_bucket(Bucket="test-invoices-bucket")
+    # Invoke the handler
+    handler(event, None)
+    # After invocation, list objects in bucket to find the invoice
+    resp = s3.list_objects_v2(Bucket="test-invoices-bucket", Prefix="abc123")
+    items = resp.get('Contents', [])
+    assert any(obj['Key'].endswith("abc123.pdf") for obj in items)

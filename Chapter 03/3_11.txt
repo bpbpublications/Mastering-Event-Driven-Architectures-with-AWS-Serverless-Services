@@ -1,0 +1,14 @@
+#python
+import boto3
+
+kinesis = boto3.client('kinesis')
+
+def send_event(event):
+	response = kinesis.put_record(
+    	StreamName='MyKinesisStream',
+    	Data=json.dumps(event),
+    	PartitionKey='partitionKey'
+	)
+    
+	return response
+

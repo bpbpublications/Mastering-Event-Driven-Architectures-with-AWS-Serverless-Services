@@ -1,0 +1,5 @@
+// JSON config
+{
+"detail-type" : [ "Order Created" , "Payment Processed" ],
+"source" : [ "com.myapp.orders" , "com.myapp.payments" ]
+}
